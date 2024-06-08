@@ -1,0 +1,35 @@
+name: Terraform AWS Workflow for Node application
+on: push
+jobs:
+  tf_build:
+    name: Terraform validation and Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout terraform code to container
+        uses: actions/checkout@v2.5.0
+        with:
+          repository: kesaripatil/ecr-nodejsapp-terraform-poc
+
+      - name: Configure AWS Credentials Action For GitHub Actions
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Setup Terraform CLI
+        uses: hashicorp/setup-terraform@v2.0.2
+
+      - name: Terraform init, plan and apply
+        run: |
+          echo `pwd`
+          echo "********** Running Terraform Init ************"
+          terraform init
+
+          echo "********** Running Terraform Validate ************"
+          terraform validate
+
+          echo "********** Running Terraform Plan ************"
+          terraform plan
+
+          echo "********** Running Terraform Apply ************"
+          terraform apply -auto-approve
